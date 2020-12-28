@@ -21,14 +21,15 @@ class KindleClippings(object):
         allClippings = allClippings.split("==========")
         clipCollection = []
         for eachClipping in allClippings:
-            if '- Your Highlight at location ' in eachClipping:
+            if '- Your Highlight on Location ' in eachClipping:
+                print('Found Highlight on Location')
                 eachClipping = eachClipping.strip().split("\n")
                 title_author = eachClipping[0].replace('(', '|').replace(')', '')
                 title, *author = title_author.split('|')
                 title = title.strip()
                 location, addedOn = eachClipping[1].strip().split('|')
-                location = location.replace('- Your Highlight at location ', '').replace(' ', '')
-                dateAdded = datetime.strptime(addedOn, ' Added on %A, %d %B %Y %X')
+                location = location.replace('- Your Highlight on Location ', '').replace(' ', '')
+                dateAdded = datetime.strptime(addedOn, ' Added on %A, %B %d, %Y %X %p')
                 clipping = eachClipping[3]
                 lastClip = {
                     'Title': title,
@@ -42,13 +43,14 @@ class KindleClippings(object):
                 self.addToNotion(lastClip)
 
             elif '- Your Note on location ' in eachClipping:
+                print('Found Note On Location')
                 eachClipping = eachClipping.strip().split("\n")
                 title_author = eachClipping[0].replace('(', '|').replace(')', '')
                 title, author = title_author.split('|')
                 title = title.strip()
                 location, addedOn = eachClipping[1].strip().split('|')
                 location = location.replace('- Your Note on location ', '').replace(' ', '')
-                dateAdded = datetime.strptime(addedOn, ' Added on %A, %d %B %Y %X')
+                dateAdded = datetime.strptime(addedOn, ' Added on %A, %B %d, %Y %X %p')
                 clipping = eachClipping[3]
                 lastClip = {
                     'Title': title,
@@ -62,6 +64,7 @@ class KindleClippings(object):
                 self.addToNotion(lastClip)
 
             elif '- Your Highlight on page ' in eachClipping and 'location ' in eachClipping:
+                print('Found Highlight on page')
                 eachClipping = eachClipping.strip().split("\n")
                 title_author = eachClipping[0].replace('(', '|').replace(')', '')
                 title, author = title_author.split('|')
@@ -69,7 +72,7 @@ class KindleClippings(object):
                 page, location, addedOn = eachClipping[1].strip().split('|')
                 page = page.replace('- Your Highlight on page ', '').replace(' ', '')
                 location = location.replace(' location ', '').replace(' ','')
-                dateAdded = datetime.strptime(addedOn, ' Added on %A, %d %B %Y %X')
+                dateAdded = datetime.strptime(addedOn, ' Added on %A, %B %d, %Y %X %p')
                 clipping = eachClipping[3]
                 lastClip = {
                     'Title': title,
@@ -83,6 +86,7 @@ class KindleClippings(object):
                 self.addToNotion(lastClip)
 
             elif '- Your Note on page ' in eachClipping and 'location ' in eachClipping:
+                print('Found Note on page')
                 eachClipping = eachClipping.strip().split("\n")
                 title_author = eachClipping[0].replace('(', '|').replace(')', '')
                 title, author = title_author.split('|')
@@ -90,7 +94,7 @@ class KindleClippings(object):
                 page, location, addedOn = eachClipping[1].strip().split('|')
                 page = page.replace('- Your Note on page ', '').replace(' ', '')
                 location = location.replace(' location ', '').replace(' ','')
-                dateAdded = datetime.strptime(addedOn, ' Added on %A, %d %B %Y %X')
+                dateAdded = datetime.strptime(addedOn, ' Added on %A, %B %d, %Y %X %p')
                 clipping = eachClipping[3]
                 lastClip = {
                     'Title': title,
@@ -104,12 +108,13 @@ class KindleClippings(object):
                 self.addToNotion(lastClip)
 
             elif '- Your Highlight on page ' in eachClipping and 'location ' not in eachClipping:
+                print('Highlight without location')
                 eachClipping = eachClipping.strip().split("\n")
                 title = eachClipping[0]
                 title = title.strip()
                 page, addedOn = eachClipping[1].strip().split('|')
                 page = page.replace('- Your Highlight on page ', '').replace(' ', '')
-                dateAdded = datetime.strptime(addedOn, ' Added on %A, %d %B %Y %X')
+                dateAdded = datetime.strptime(addedOn, ' Added on %A, %B %d, %Y %X %p')
                 clipping = eachClipping[3]
                 lastClip = {
                     'Title': title,
@@ -123,12 +128,13 @@ class KindleClippings(object):
                 self.addToNotion(lastClip)
 
             elif '- Your Note on page ' in eachClipping and 'location ' not in eachClipping:
+                print('Note without location')
                 eachClipping = eachClipping.strip().split("\n")
                 title = eachClipping[0]
                 title = title.strip()
                 page, addedOn = eachClipping[1].strip().split('|')
                 page = page.replace('- Your Note on page ', '').replace(' ', '')
-                dateAdded = datetime.strptime(addedOn, ' Added on %A, %d %B %Y %X')
+                dateAdded = datetime.strptime(addedOn, ' Added on %A, %B %d, %Y %X %p')
                 clipping = eachClipping[3]
                 lastClip = {
                     'Title': title,
@@ -140,9 +146,9 @@ class KindleClippings(object):
                     }
                 clipCollection.append(lastClip)
                 self.addToNotion(lastClip)
-                print(self._getClipping())
-
             else:
+                print('Skipping Clipping')
+                print(eachClipping)
                 continue
         return clipCollection
 
@@ -169,17 +175,17 @@ class KindleClippings(object):
                 if lastClip['Page'] != None:
                     parentPage.children.add_new(
                         TextBlock,
-                        title = "Page: " + lastClip['Page'] + "\tLocation: " + lastClip['Location'] + "\tDate Added: " +  str(lastClip['Date Added'].strftime("%A, %d %B %Y %I:%M:%S %p"))
+                        title = "Page: " + lastClip['Page'] + "\tLocation: " + lastClip['Location'] + "\tDate Added: " +  str(lastClip['Date Added'].strftime("%A, %B %d, %Y %I:%M:%S %p"))
                     )
                 else:
                     parentPage.children.add_new(
                         TextBlock,
-                        title = "Location: " + lastClip['Location'] + "\tDate Added: " +  str(lastClip['Date Added'].strftime("%A, %d %B %Y %I:%M:%S %p"))
+                        title = "Location: " + lastClip['Location'] + "\tDate Added: " +  str(lastClip['Date Added'].strftime("%A, %B %d, %Y %I:%M:%S %p"))
                     )
             else:
                 parentPage.children.add_new(
                     TextBlock,
-                    title = "Page: " + lastClip['Page'] + "\tDate Added: " +  str(lastClip['Date Added'].strftime("%A, %d %B %Y %I:%M:%S %p"))
+                    title = "Page: " + lastClip['Page'] + "\tDate Added: " +  str(lastClip['Date Added'].strftime("%A, %B %d, %Y %I:%M:%S %p"))
                 )
             parentPage.children.add_new(
                 QuoteBlock,
